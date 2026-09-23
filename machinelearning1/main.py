@@ -233,6 +233,10 @@ debug_frame_counter = 0
 
 print("Mostre um gesto (Nu Metal Pose, Six-Seven, Jóia, Paz, Coração ou Dedo do Meio)! Pressione 'q' para sair.")
 
+WINDOW_NAME = 'Nu Metal Detector (Com Imagem!)'
+cv2.namedWindow(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -356,7 +360,7 @@ while cap.isOpened():
     else: # Se nenhum gesto ativo nem tempo mínimo de exibição restante
         current_image_to_display = None # Limpa a imagem
 
-    cv2.imshow('Nu Metal Detector (Com Imagem!)', bgr_frame)
+    cv2.imshow(WINDOW_NAME, bgr_frame)
 
     if cv2.waitKey(5) & 0xFF == ord('q'):
         break
