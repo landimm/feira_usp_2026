@@ -5,7 +5,21 @@ from mediapipe.tasks.python import vision as mp_vision
 import random
 import numpy as np
 import time
+import subprocess
+import re
 from collections import deque
+
+def get_screen_resolution(default=(1920, 1080)):
+    try:
+        output = subprocess.check_output(['xrandr']).decode()
+        match = re.search(r'current (\d+) x (\d+)', output)
+        if match:
+            return int(match.group(1)), int(match.group(2))
+    except Exception:
+        pass
+    return default
+
+SCREEN_WIDTH, SCREEN_HEIGHT = get_screen_resolution()
 
 # --- Índices dos pontos da mão (mesmos 21 landmarks de sempre, só que sem o enum mp_hands.HandLandmark) ---
 WRIST = 0
@@ -360,6 +374,7 @@ while cap.isOpened():
     else: # Se nenhum gesto ativo nem tempo mínimo de exibição restante
         current_image_to_display = None # Limpa a imagem
 
+    bgr_frame = cv2.resize(bgr_frame, (SCREEN_WIDTH, SCREEN_HEIGHT), interpolation=cv2.INTER_LINEAR)
     cv2.imshow(WINDOW_NAME, bgr_frame)
 
     if cv2.waitKey(5) & 0xFF == ord('q'):
