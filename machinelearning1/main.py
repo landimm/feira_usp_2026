@@ -236,6 +236,9 @@ print(f"--- Imagens carregadas: { {name: len(imgs) for name, imgs in GESTURE_IMA
 
 # Inicializa a Webcam
 cap = cv2.VideoCapture(0)
+# Pede a maior resolução que a webcam suportar, pra não ficar pixelizado ao esticar pra tela cheia
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 # Controle de estado
 STABILITY_FRAMES = 6  # Quantos frames seguidos um gesto precisa se manter pra não disparar com tremedeira
@@ -374,7 +377,7 @@ while cap.isOpened():
     else: # Se nenhum gesto ativo nem tempo mínimo de exibição restante
         current_image_to_display = None # Limpa a imagem
 
-    bgr_frame = cv2.resize(bgr_frame, (SCREEN_WIDTH, SCREEN_HEIGHT), interpolation=cv2.INTER_LINEAR)
+    bgr_frame = cv2.resize(bgr_frame, (SCREEN_WIDTH, SCREEN_HEIGHT), interpolation=cv2.INTER_CUBIC)
     cv2.imshow(WINDOW_NAME, bgr_frame)
 
     if cv2.waitKey(5) & 0xFF == ord('q'):
