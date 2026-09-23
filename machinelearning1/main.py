@@ -236,9 +236,11 @@ print(f"--- Imagens carregadas: { {name: len(imgs) for name, imgs in GESTURE_IMA
 
 # Inicializa a Webcam
 cap = cv2.VideoCapture(0)
-# Pede a maior resolução que a webcam suportar, pra não ficar pixelizado ao esticar pra tela cheia
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+# 720p é um bom meio-termo: bem menos pixelizado que o padrão, sem pesar demais no processamento
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+DETECTION_WIDTH = 320  # Detecção roda numa cópia menor pra ganhar FPS; os pontos são normalizados (0-1) e continuam válidos no frame grande
 
 # Controle de estado
 STABILITY_FRAMES = 6  # Quantos frames seguidos um gesto precisa se manter pra não disparar com tremedeira
@@ -262,7 +264,10 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1) # Inverte para modo selfie
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+    h, w = rgb_frame.shape[:2]
+    detection_height = int(h * (DETECTION_WIDTH / w))
+    small_rgb_frame = cv2.resize(rgb_frame, (DETECTION_WIDTH, detection_height), interpolation=cv2.INTER_LINEAR)
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=small_rgb_frame)
     detection_result = detector.detect(mp_image)
 
     bgr_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR)
